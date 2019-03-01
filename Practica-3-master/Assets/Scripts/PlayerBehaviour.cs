@@ -22,6 +22,9 @@ public class PlayerBehaviour : MonoBehaviour
 	public float runSpeed		= 1;		// Parametro que define la velocidad de "correr"
 	public float rotateSpeed	= 160;		// Parametro que define la velocidad de "girar"
 
+    public AudioClip attackSound;
+    public AudioClip damageSound;
+    public AudioClip deathSound;
 	// Variables auxiliares
 	float _angularSpeed			= 0;		// Velocidad de giro actual
 	float _speed				= 0;		// Velocidad de traslacion actual
@@ -49,9 +52,10 @@ public class PlayerBehaviour : MonoBehaviour
 		// Calculo de velocidad lineal (_speed) y angular (_angularSpeed) en función del Input
 		// Si camino/corro hacia delante delante: _speed = walkSpeed   /  _speed = runSpeed
 		// TODO
-        if (Input.GetKey(KeyCode.UpArrow))
+        if (Input.GetKey(KeyCode.UpArrow) || CrossButton.GetInput(InputType.UP))
         {
-            if (Input.GetKey(KeyCode.LeftShift)){
+            if (Input.GetKey(KeyCode.LeftShift) || CrossButton.GetInput(InputType.RUN))
+            {
                 _speed = runSpeed;
             }
             else
@@ -61,7 +65,7 @@ public class PlayerBehaviour : MonoBehaviour
         }
 		// Si camino/corro hacia delante detras: _speed = -walkSpeed   /  _speed = -runSpeed
 		// TODO
-        else if (Input.GetKey(KeyCode.DownArrow))
+        else if (Input.GetKey(KeyCode.DownArrow) || CrossButton.GetInput(InputType.DOWN))
         {
             _speed = -walkSpeed;
         }
@@ -75,7 +79,7 @@ public class PlayerBehaviour : MonoBehaviour
         }
         // Si giro izquierda: _angularSpeed = -rotateSpeed;
         // TODO
-        if (Input.GetKey(KeyCode.LeftArrow))
+        if (Input.GetKey(KeyCode.LeftArrow) || CrossButton.GetInput(InputType.LEFT))
         {
             _angularSpeed = -rotateSpeed;
         }
@@ -83,7 +87,7 @@ public class PlayerBehaviour : MonoBehaviour
 
         // Si giro derecha: _angularSpeed = rotateSpeed;
         // TODO
-        else if (Input.GetKey(KeyCode.RightArrow))
+        else if (Input.GetKey(KeyCode.RightArrow) || CrossButton.GetInput(InputType.RIGHT))
         {
             _angularSpeed = rotateSpeed;
         }
@@ -115,9 +119,15 @@ public class PlayerBehaviour : MonoBehaviour
         if (paused) return;
 
         // Si detecto Input tecla/boton ataque ==> Activo disparados 'Attack'
-        else if (Input.GetKeyDown(KeyCode.Space))
+        else if (Input.GetKeyDown(KeyCode.Space) || CrossButton.GetInput(InputType.ATTACK))
         {
             anim.SetTrigger(attackHash);
+            if (GameManager.instance.soundEnabled)
+            {
+                GetComponent<AudioSource>().clip = attackSound;
+                GetComponent<AudioSource>().Play();
+            }
+            
         }
 
     }
@@ -141,8 +151,8 @@ public class PlayerBehaviour : MonoBehaviour
         anim.ResetTrigger(deadHash);
         // Posicionar el jugador en el (0,0,0) y rotación nula (Quaternion.identity)
         // TODO
-        rb.MovePosition(Vector3.zero);
-        rb.MoveRotation(Quaternion.identity);
+        transform.position = Vector3.zero;
+        transform.rotation = Quaternion.identity;
 	}
 
 	// Funcion recibir daño
@@ -152,10 +162,20 @@ public class PlayerBehaviour : MonoBehaviour
         // Si no me quedan vidas notificar al GameManager (notifyPlayerDead) y disparar trigger "Dead"
         // TODO
         _lives -= 1;
+        if (GameManager.instance.soundEnabled)
+        {
+            GetComponent<AudioSource>().clip = damageSound;
+            GetComponent<AudioSource>().Play();
+        }
         if (_lives == 0)
         {
-            //GameManager.notifyPlayerDead();
+            GameManager.instance.notifyPlayerDead();
             anim.SetTrigger(deadHash);
+            if (GameManager.instance.soundEnabled)
+            {
+                GetComponent<AudioSource>().clip = deathSound;
+                GetComponent<AudioSource>().Play();
+            }
 
         }
         // Si aun me quedan vidas dispara el trigger TakeDamage

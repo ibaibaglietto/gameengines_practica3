@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour
 	public PlayerBehaviour player = null;
 	public List<SkeletonBehaviour> enemiesList = null;	// No requiere inicializacion, se rellena desde el Inspector
 
+    public UIManager canvas;
 	// Lista con los enemigos que quedan vivos
 	List<SkeletonBehaviour> currentEnemiesList = null;
 
@@ -26,18 +27,19 @@ public class GameManager : MonoBehaviour
 	void Start ()
 	{
 		currentEnemiesList = new List<SkeletonBehaviour>();
-		
-		// Reiniciamos el juego
-		// TODO
+
+        // Reiniciamos el juego
+        reset();
 	}
 
 	private void reset()		// Funcion para reiniciar el juego
 	{
-		// Reiniciamos a Player
-		// TODO
-
-		// Incializamos la puntuacion a cero
-		// TODO
+        // Reiniciamos a Player
+        // TODO
+        player.reset();
+        // Incializamos la puntuacion a cero
+        // TODO
+        _score = 0;
 
 		// Rellenamos la lista de enemigos actual.
 		currentEnemiesList.Clear();
@@ -50,28 +52,36 @@ public class GameManager : MonoBehaviour
 		}
 	}
 
-	#region UI EVENTS
-	// Evento al pulsar boton 'Start'
-	public void onStartGameButton()
+    private void Update()
+    {
+        if (soundEnabled) GetComponent<AudioSource>().volume = 0.25f;
+        else GetComponent<AudioSource>().volume = 0;
+    }
+
+    #region UI EVENTS
+    // Evento al pulsar boton 'Start'
+    public void onStartGameButton()
 	{
-		// Ocultamos el menu principal (UIManager)
-		// TODO
-
-		// Actualizamos la puntuacion en el panel Score (UIManager)
-		// TODO
-
-		// Quitamos la pausa a Player
-		// TODO
+        // Ocultamos el menu principal (UIManager)
+        // TODO
+        canvas.hideMainMenu();
+        // Actualizamos la puntuacion en el panel Score (UIManager)
+        // TODO
+        canvas.updateScore(_score);
+        // Quitamos la pausa a Player
+        // TODO
+        player.paused = false;
 	}
 
 	// Evento al pulsar boton 'Exit'
 	public void onExitGameButton()
 	{
-		// Mostramos el panel principal
-		// TODO
-
-		// Reseteamos el juego
-		// TODO
+        // Mostramos el panel principal
+        // TODO
+        canvas.showMainMenu();
+        // Reseteamos el juego
+        // TODO
+        reset();
 	}
 	#endregion
 
@@ -82,22 +92,29 @@ public class GameManager : MonoBehaviour
 		// Eliminamos enemigo de la lista actual
 		currentEnemiesList.Remove(enemy);
 
-		// Subimos 10 puntos y actualizamos la puntuacion en la UI
-		// TODO
-
+        // Subimos 10 puntos y actualizamos la puntuacion en la UI
+        // TODO
+        _score += 10;
+        canvas.updateScore(_score);
 		// Si no quedan enemmigos
 		if (currentEnemiesList.Count == 0)	// KEEP
 		{
-			// Mostrar panel de 'Mision cumplida' y pausar a Player
-			// TODO
-		}
+
+            // Mostrar panel de 'Mision cumplida' y pausar a Player
+            // TODO
+            canvas.showEndPanel(true);
+            player.paused = true;
+        }
 	}
 
 	// Evento al ser notificado por player (cuando muere)
 	public void notifyPlayerDead()
 	{
-		// Mostrar panel de 'Mision fallida' y pausar a Player
-		// TODO
-	}
+
+        // Mostrar panel de 'Mision fallida' y pausar a Player
+        // TODO
+        canvas.showEndPanel(false);
+        player.paused = true;
+    }
 	#endregion
 }

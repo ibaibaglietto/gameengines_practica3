@@ -19,35 +19,45 @@ public class UIManager : MonoBehaviour
 
 	public void showMainMenu()
 	{
-		// Mostrar objeto mainMenu
-		// TODO
-
-		// Ocultar endPanel
-		// TODO
+        // Mostrar objeto mainMenu
+        // TODO
+        mainMenu.SetActive(true);
+        // Ocultar endPanel
+        // TODO
+        hideEndPanel();
 	}
 
 	public void hideMainMenu()
 	{
-		// Ocultar objeto mainMenu
-		// TODO
+        // Ocultar objeto mainMenu
+        // TODO
+        mainMenu.SetActive(false);
 	}
 
 	public void showEndPanel(bool win)
 	{
-		// Mostrar panel fin de juego (ganar o perder)
-		// TODO
+        // Mostrar panel fin de juego (ganar o perder)
+        // TODO
+        Text text = endPanel.GetComponentInChildren<Text>();
+        if (win) text.text = "Mision cumplida";
+        else text.text = "Mision fallida";
+
+        endPanel.appear();
+
 	}
 
 	public void hideEndPanel()
 	{
-		// Ocultar el panel
-		// TODO
-	}
+        // Ocultar el panel
+        // TODO
+        endPanel.reset();
+    }
 
 	public void updateScore(int score)
 	{
-		// Actualizar el 'UI text' con la puntuacion 
-		// TODO
+        // Actualizar el 'UI text' con la puntuacion 
+        // TODO
+        scoreText.text = score.ToString();
 	}
 
 }

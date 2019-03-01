@@ -2,7 +2,7 @@
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public enum InputType {NONE, UP, DOWN, LEFT, RIGHT}
+public enum InputType {NONE, UP, DOWN, LEFT, RIGHT, RUN, ATTACK}
 
 public class CrossButton : UIBehaviour
 {

@@ -14,6 +14,9 @@ public class SkeletonBehaviour : MonoBehaviour
     int attackStateHash = Animator.StringToHash("Base Layer.Attack");
     // TODO
 
+    public AudioClip attackSound;
+    public AudioClip deathSound;
+
     Animator anim;
 
     // Variables auxiliares 
@@ -46,16 +49,24 @@ public class SkeletonBehaviour : MonoBehaviour
         // - Si ha pasado 1s o más desde el ultimo ataque ==> attack()
         // TODO
         _timeToAttack += Time.fixedDeltaTime;
-        //float distPlayer = Mathf.Sqrt(Mathf.Pow(transform.position.x - _player.transform.position.x, 2) + Mathf.Pow(transform.position.z - _player.transform.position.z, 2));
-        //if (distPlayer < 1.0f)
-        //{
-            //transform.LookAt(_player.transform.position);
-            if (_timeToAttack > 1.0f)
+        float distPlayer = Mathf.Sqrt(Mathf.Pow(transform.position.x - _player.transform.position.x, 2) + Mathf.Pow(transform.position.z - _player.transform.position.z, 2));
+   
+        if (distPlayer < 2.0f)
+        {
+            transform.LookAt(_player.transform.position);
+            if (_timeToAttack > 2.5f)
             {
+                
                 attack();
+                if (GameManager.instance.soundEnabled)
+                {
+                    GetComponent<AudioSource>().clip = attackSound;
+                    GetComponent<AudioSource>().PlayDelayed(0.5f);
+                }
                 _timeToAttack = 0.0f;
+
             }
-        //}
+        }
         // Desplazar el collider en 'z' un multiplo del parametro Distance
         // TODO
         BoxCollider bc = GetComponent<BoxCollider>();
@@ -75,18 +86,23 @@ public class SkeletonBehaviour : MonoBehaviour
         // Guardo que estoy muerto, disparo trigger "Dead" y desactivo el collider
         // TODO
         _dead = true;
+        if (GameManager.instance.soundEnabled)
+        {
+            GetComponent<AudioSource>().clip = deathSound;
+            GetComponent<AudioSource>().Play();
+        }
         anim.SetTrigger(deadHash);
         GetComponent<BoxCollider>().enabled = false;
         // Notifico al GameManager que he sido eliminado
         // TODO
-        //GameManager.notifyEnemyKilled(gameObject);
+        GameManager.instance.notifyEnemyKilled(GetComponent<SkeletonBehaviour>());
     }
 
     // Funcion para resetear el collider (activado por defecto), la variable donde almaceno si he muerto y forzar el estado "Idle" en Animator
     public void reset()
 	{
         GetComponent<BoxCollider>().enabled = true;
-        _dead = true;
+        _dead = false;
         anim.ResetTrigger(deadHash);
         anim.Play(idleStateHash);
     }
