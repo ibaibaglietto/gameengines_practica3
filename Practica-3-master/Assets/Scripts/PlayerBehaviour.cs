@@ -34,6 +34,8 @@ public class PlayerBehaviour : MonoBehaviour
 	int _lives = 3;							// Vidas restantes
 	public bool paused = false;				// Indica si el player esta pausado (congelado). Que no responde al Input
 
+    bool attacking;
+
 	void Start()
 	{
         // Obtener los componentes Animator, Rigidbody y el valor original center.z del BoxCollider
@@ -113,15 +115,26 @@ public class PlayerBehaviour : MonoBehaviour
 	// En este bucle solamente comprobaremos si el Input nos indica "atacar" y activaremos el trigger "Attack"
 	private void Update()
 	{
+        
 
         // Si estoy en pausa no hacer nada (no moverme ni atacar)
         // TODO
         if (paused) return;
 
-        // Si detecto Input tecla/boton ataque ==> Activo disparados 'Attack'
-        else if (Input.GetKeyDown(KeyCode.Space) || CrossButton.GetInput(InputType.ATTACK))
+        if (anim.GetCurrentAnimatorStateInfo(1).IsName("End Attack"))
         {
-            anim.SetTrigger(attackHash);
+            anim.ResetTrigger(attackHash);
+            anim.SetTrigger("EndAttack");
+        }
+
+        // Si detecto Input tecla/boton ataque ==> Activo disparados 'Attack'
+        if (Input.GetKeyDown(KeyCode.Space) || CrossButton.GetInput(InputType.ATTACK))
+        {
+            if (!anim.GetCurrentAnimatorStateInfo(1).IsName("Attack")){
+                anim.SetTrigger(attackHash);
+            }
+            
+            print("Attack");
             if (GameManager.instance.soundEnabled)
             {
                 GetComponent<AudioSource>().clip = attackSound;
